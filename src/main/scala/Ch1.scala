@@ -11,7 +11,7 @@ object Ch1 {
 
   // Problem 2
   def add202DSeq(seq2D: Seq[Seq[Int]]): Seq[Seq[Int]] =
-    seq2D map { intSeq => intSeq map (_ + 20) }
+    seq2D.map(_.map(_ + 20))
 
   // Problem 3
   def isThreeFactor(n: Int): Boolean = (2 until n).filter(j => n % j == 0).size == 3
