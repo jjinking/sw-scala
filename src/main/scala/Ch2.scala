@@ -27,4 +27,20 @@ object Exercises1 {
 
 object Exercises2 {
 
+  // Problem 1
+  def p1(purchasedItems: Seq[(String, Int)]): Map[String, Int] =
+    purchasedItems.groupBy(_._1).map{case (k, v) => (k, v.map(_._2).sum)}
+
+  // Problem 2
+  def p2(numsLists: Seq[List[Int]]): Seq[List[Int]] =
+    numsLists.map(_.sortBy(-_).take(3))
+
+  // Problem 3
+  def p3[I, J](a: Set[I], b: Set[J]): Set[(I, J)] =
+    a.flatMap(x => b.map(y => (x, y)))
+
+  // Problem 4
+  def p4[Person, Amount](daily: Seq[Map[Person, Amount]]): Map[Person, Seq[Amount]] =
+    daily.flatMap(_.toSeq).groupBy(_._1).map{case (k, v) => (k, v.map(_._2))}
+
 }
