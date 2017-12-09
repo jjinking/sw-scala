@@ -7,11 +7,11 @@ object Exercises1 {
 
   // Problem 1
   lazy val p1: Seq[(Int, Int)] = zeroToNine.flatMap(i => zeroToNine.map(j => (i, j)))
-    .filter{case (i: Int, j: Int) => i + 4 * j  > i * j}
+    .filter{case (i, j) => i + 4 * j  > i * j}
 
   // Problem 2
   def p2(ss: Seq[String], bs: Seq[Boolean]): Seq[String] =
-    ss.zip(bs).filter{case (s: String, b: Boolean) => b}.map(_._1)
+    ss.zip(bs).filter(_._2).map(_._1)
 
   // Problem 3
   def p3(nums: Seq[Int]): Seq[(Int, Boolean)] =
