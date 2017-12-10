@@ -53,4 +53,44 @@ class Ch2Spec extends FlatSpec with Matchers {
     )
     Exercises2.p4(p4Input) shouldEqual p4ExpectedOutput
   }
+
+  "Exercises 3" should "pass all tests" in {
+
+    // Problem 1
+    Exercises3.sqSumDigits(123) shouldEqual 14
+    Exercises3.sqSumDigits(1) shouldEqual 1
+
+    // Problem 2
+    Exercises3.isNotCubeHappy(30) shouldEqual true
+    Exercises3.isNotCubeHappy(23) shouldEqual true
+    Exercises3.isNotCubeHappy(45) shouldEqual true
+    Exercises3.isNotCubeHappy(10) shouldEqual false
+    Exercises3.isNotCubeHappy(100) shouldEqual false
+    Exercises3.isNotCubeHappy(1) shouldEqual false
+
+    // Problem 3
+    Exercises3.collatz(12) shouldEqual Seq(12, 6, 3, 10, 5, 16, 8, 4, 2, 1)
+
+    // Problem 4
+    val p4ExpectedOutput = Set(
+      Set(1, 4, 6),
+      Set(1, 4, 7),
+      Set(1, 5, 6),
+      Set(1, 5, 7),
+      Set(2, 4, 6),
+      Set(2, 4, 7),
+      Set(2, 5, 6),
+      Set(2, 5, 7),
+    )
+    Exercises3.set3(Set(1, 2), Set(4, 5), Set(6, 7)) shouldEqual p4ExpectedOutput
+
+    // Problem 5
+    val p5Input = Set(
+      Set(1, 2),
+      Set(4, 5),
+      Set(6, 7)
+    )
+    val p5ExpectedOutput = p4ExpectedOutput
+    Exercises3.set3Alt(p5Input) shouldEqual p5ExpectedOutput
+  }
 }
