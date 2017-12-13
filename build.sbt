@@ -13,9 +13,9 @@ scalaVersion in ThisBuild := "2.12.3"
 
 // It's possible to define many kinds of settings, such as:
 
-name := "hello-world"
-organization := "ch.epfl.scala"
-version := "1.0"
+name := "sw-scala"
+organization := "sw.scala"
+version := "0.1"
 
 // Note, it's not required for you to define these three settings. These are
 // mostly only necessary if you intend to publish your library's binaries on a

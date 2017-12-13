@@ -40,7 +40,7 @@ object Exercises2 {
 
   // Problem 4
   def p4[Person, Amount](daily: Seq[Map[Person, Amount]]): Map[Person, Seq[Amount]] =
-    daily.flatMap(_.toSeq).groupBy(_._1).map{case (k, v) => (k, v.map(_._2))}
+    daily.flatMap(_.toSeq).groupBy(_._1).mapValues(_.map(_._2))
 }
 
 object Exercises3 {
@@ -50,23 +50,26 @@ object Exercises3 {
   def sumDigits(f: Int => Int)(num: Int): Int =
     num.toString.map(d => f(d.asDigit)).sum
 
-  val sqSumDigits: Int => Int = sumDigits((x:Int) => x * x)
+  def sumDigitsIterator(f: Int => Int)(num: Int): Int = {
+    Iterator.iterate((num, 0)) { case (m, _) ⇒ (m / 10, m % 10)  }
+      .takeWhile{case (m, d) ⇒ m > 0 || d > 0 }
+      .drop(1).map(p => f(p._2)).sum
+  }
+
+  val sqSumDigits = sumDigitsIterator(x => x * x) _
 
   // Problem 2
-  def cubeSumDigits: Int => Int = sumDigits((x: Int) => x * x * x)
+  def cubeSumDigits: Int => Int = sumDigitsIterator((x: Int) => x * x * x)
   def isNotCubeHappy(num: Int): Boolean = {
-    def aux(num: Int, seen: Set[Int]): Boolean = {
-      val cubeSum = cubeSumDigits(num)
-      if (cubeSum == 1) {
-        false
-      } else if (seen.contains(cubeSum)) {
-        true
-      } else {
-        aux(cubeSum, seen + cubeSum)
-      }
-    }
-    aux(num, Set[Int]())
+    val (currNum: Int, seen: Set[Int]) = Iterator.iterate(num, Set[Int]()){
+      case (currNum, seen) => (cubeSumDigits(currNum), seen + currNum)}
+      .dropWhile{ case (currNum, seen) => currNum != 1 && !seen.contains(currNum) }
+      .next()
+
+    // Return true if repetition, otherwise current number is 1, so return false
+    seen.contains(currNum) // || currNum != 1
   }
+
   // // Generate seqs
   // def generateCubeSums(num: Int): Unit = {
   //   var cubeSum = 0
@@ -81,15 +84,10 @@ object Exercises3 {
   // }
 
   // Problem 3
-  def collatz(n: Int): List[Int] = {
-    val cNext = {
-      if (n % 2 == 0) n / 2
-      else 3 * n + 1
-    }
-    n :: {
-      if (cNext == 1) List(cNext)
-      else collatz(cNext)
-    }
+  def collatz(n: Int): Seq[Int] = {
+    Iterator.iterate((n, false)) {
+      case (x, _) => (if (x % 2 == 0) x / 2  else 3 * x + 1, x == 1) }
+      .takeWhile(!_._2).map(_._1).toSeq
   }
 
   // Problem 4
