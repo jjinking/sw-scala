@@ -16,6 +16,8 @@ object Ch3Exercises {
     id[U => U](id[U]: U => U): U => U
     combine id(id) to idid
     idid[U] = U => U
+    val idid[A] = id[A => A](id[A])
+    idid does the same as what id[A] does
 
     id(const)
     def const[C, X]: (C ⇒ X ⇒ C) = c ⇒ x ⇒ c
@@ -31,6 +33,7 @@ object Ch3Exercises {
 
     id((id(id))) works, using simliar logic as above
     */
+  def id[T]: (T => T) = t => t
 
   /**
     Problem 2
@@ -42,9 +45,9 @@ object Ch3Exercises {
     const[C, X](const[D, Y]: (D => Y => D)): X => C
     substitute D => Y => D into C
     const[D => Y => D, X](const[D, Y]): X => D => Y => D
-    const(const) returns a function that takes in an argument of type X and returns
-    a const[D, Y]
+    const(const) returns a function that takes in an argument of type X and returns const[D, Y]
     */
+  def const[C, X]: C ⇒ X ⇒ C = c ⇒ x ⇒ c
 
   /**
     Problem 3

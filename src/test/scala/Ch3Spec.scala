@@ -8,6 +8,15 @@ class Ch3Spec extends FlatSpec with Matchers {
 
   "Ch3" should "pass all test" in {
 
+    // Problem 1
+    id(id[Int])(3) shouldEqual 3
+    val int2Str = (x: Int) => x.toString
+    id(id[Int => String])(int2Str) shouldEqual int2Str
+
+    // Problem 2
+    val constBoolInt = const[Boolean, Int]
+    const[Boolean => Int => Boolean, String](constBoolInt)("hello") shouldEqual constBoolInt
+
     // Problem 3
     val add1: Int => Int = n => n + 1
     val n = 0
@@ -35,5 +44,4 @@ class Ch3Spec extends FlatSpec with Matchers {
     g(10, 2) shouldEqual -8
     g(2, 10) shouldEqual 8
   }
-
 }
