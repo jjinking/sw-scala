@@ -43,5 +43,11 @@ class Ch3Spec extends FlatSpec with Matchers {
     f(10, 2) shouldEqual 8
     g(10, 2) shouldEqual -8
     g(2, 10) shouldEqual 8
+
+    // Problem 7
+    "def r[A, B, C]: (((A => B) => B) => C) => A => C = p ⇒ q ⇒ p(t ⇒ t(q))" should compile
+
+    // Problem 9
+    "def s[B, C, D]: ((((C => D) => D) => B) => C) => (((C => D) => D) => B) => B = f ⇒ g ⇒ g(x ⇒ x(f(g)))" should compile
   }
 }

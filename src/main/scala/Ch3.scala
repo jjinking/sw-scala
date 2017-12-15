@@ -89,9 +89,9 @@ object Ch3Exercises {
     Problem 7
     Infer types
     def r[...]:... = p ⇒ q ⇒ p(t ⇒ t(q))
-    let q: A, t: A => B, p: (A => B) => C
-    def r[...]:... = (p: (A => B) => C) => (q: A) => (p(t => t(q)): C)
-    r[A, B, C]: ((A => B) => C) => A => C
+    let q: A, t: A => B, p: ((A => B) => B) => C
+    def r[...]:... = (p: ((A => B) => B) => C) => (q: A) => (p(t => t(q)): C)
+    r[A, B, C]: (((A => B) => B) => C) => A => C
     */
 
   /**
