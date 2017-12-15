@@ -88,6 +88,15 @@ object Ch3Exercises {
   /**
     Problem 7
     Infer types
+    def r[...]:... = p ⇒ q ⇒ p(t ⇒ t(q))
+    let q: A, t: A => B, p: (A => B) => C
+    def r[...]:... = (p: (A => B) => C) => (q: A) => (p(t => t(q)): C)
+    r[A, B, C]: ((A => B) => C) => A => C
+    */
+
+  /**
+    Problem 8
+    Show not well typed
     def r[...]:... = p ⇒ p(q ⇒ q(p))
     let p: A and q: A => B
     def r[...]:... = p: A ⇒ p(q:(A => B) ⇒ q(p: A): B)
@@ -97,7 +106,7 @@ object Ch3Exercises {
     */
 
   /**
-    Problem 8
+    Problem 9
     Infer types
     def s[...]:... = f ⇒ g ⇒ g(x ⇒ x(f(g)))
     let g: A => B, f: (A => B) => C, x: C => D
@@ -108,7 +117,7 @@ object Ch3Exercises {
     */
 
   /**
-    Problem 9
+    Problem 10
     Show not well typed
     def s[...]:... = f ⇒ g ⇒ g(x ⇒ f(g(x)))
     let x: A, g: A => B, f: B => C

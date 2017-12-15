@@ -47,9 +47,6 @@ object Exercises3 {
 
 
   // Problem 1
-  def sumDigits(f: Int => Int)(num: Int): Int =
-    num.toString.map(d => f(d.asDigit)).sum
-
   def sumDigitsIterator(f: Int => Int)(num: Int): Int = {
     Iterator.iterate((num, 0)) { case (m, _) ⇒ (m / 10, m % 10)  }
       .takeWhile{case (m, d) ⇒ m > 0 || d > 0 }
