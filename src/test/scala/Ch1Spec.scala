@@ -3,6 +3,7 @@ package swscala.unit
 import org.scalatest._
 import swscala.Ch1
 
+
 class Ch1Spec extends FlatSpec with Matchers {
 
   "Ch1" should "pass all tests" in {
