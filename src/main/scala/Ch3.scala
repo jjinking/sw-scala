@@ -142,12 +142,12 @@ object Ch3Ex2 {
 
   // Problem 2
   def numCellsShowingZeroNeighborBombs(cells: Seq[Seq[CellState]]): Int = {
-    cells.flatten.filter{
+    cells.flatten.count {
       _ match {
         case OpenCell(0) => true
         case _ => false
       }
-    }.length
+    }
   }
 
   // Problem 3
@@ -163,12 +163,12 @@ object Ch3Ex2 {
 
   // Problem 4
   def solve1(pairs: Seq[(Double, Double)]): Seq[Double] = {
-    pairs.map{ case (a, b) => solve1(a, b) }.map {
+    pairs.map{ case (a, b) => solve1(a, b) }.flatMap {
       _ match {
         case OneRoot(x) => Some(x)
         case _ => None
       }
-    }.flatten
+    }
   }
 
   // Problem 5
