@@ -1,7 +1,7 @@
 package swscala
 
 
-object Exercises1 {
+object Ch2Ex1 {
 
   val zeroToNine = (0 to 9)
 
@@ -24,7 +24,7 @@ object Exercises1 {
   def p5[S](a: Seq[S], b: Seq[Int]) = a.zip(b).sortBy(_._2).map(_._1)
 }
 
-object Exercises2 {
+object Ch2Ex2 {
 
   // Problem 1
   def p1(purchasedItems: Seq[(String, Int)]): Map[String, Int] =
@@ -43,7 +43,7 @@ object Exercises2 {
     daily.flatMap(_.toSeq).groupBy(_._1).mapValues(_.map(_._2))
 }
 
-object Exercises3 {
+object Ch2Ex3 {
 
 
   // Problem 1

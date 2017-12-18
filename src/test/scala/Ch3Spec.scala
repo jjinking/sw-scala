@@ -1,13 +1,15 @@
 package swscala.unit
 
 import org.scalatest._
-import swscala.Ch3Exercises._
+import swscala._
 
 
 class Ch3Spec extends FlatSpec with Matchers {
 
-  "Ch3" should "pass all test" in {
+  "Ch3Ex1" should "pass all tests" in {
 
+    import Ch3Ex1._
+    
     // Problem 1
     id(id[Int])(3) shouldEqual 3
     val int2Str = (x: Int) => x.toString
@@ -49,5 +51,48 @@ class Ch3Spec extends FlatSpec with Matchers {
 
     // Problem 9
     "def s[B, C, D]: ((((C => D) => D) => B) => C) => (((C => D) => D) => B) => B = f ⇒ g ⇒ g(x ⇒ x(f(g)))" should compile
+  }
+
+  "Ch3Ex2" should "pass all tests" in {
+
+    import Ch3Ex2._
+
+    // Problem 1
+    ClosedCell().isBomb shouldEqual false
+    BombCell().isBomb shouldEqual true
+    OpenCell(3).isBomb shouldEqual false
+
+    // Problem 2
+    val inputCells = Seq(
+      Seq(OpenCell(0), BombCell(), ClosedCell()),
+      Seq(OpenCell(1), BombCell(), ClosedCell()),
+      Seq(OpenCell(0), BombCell(), ClosedCell())
+    )
+    numCellsShowingZeroNeighborBombs(inputCells) shouldEqual 2
+
+    // Problem 3
+    solve1(0, 0) shouldEqual AllXRoots()
+    solve1(0, 3) shouldEqual NoRoot()
+    solve1(2, 4) shouldEqual OneRoot(-2)
+
+    // Problem 4
+    solve1(Seq((0, 0), (0, 1), (2, 4), (3, 6), (4, -8), (-9, 9))) shouldEqual Seq(-2, -2 , 2, 1)
+
+    // Problem 5
+    f1(Some((1, "a"))) shouldEqual (Some(1), Some("a"))
+    f1(None) shouldEqual (None, None)
+
+    f2(Left(1)) shouldEqual (Some(1), None)
+    f2(Right("a")) shouldEqual (None, Some("a"))
+
+    var f3In: Either[Int, Either[String, Boolean]] = Left(1)
+    var f3Out: Either[Either[Int, String], Boolean] = Left(Left(1))
+    f3(f3In) shouldEqual f3Out
+    f3In = Right(Left("a"))
+    f3Out = Left(Right("a"))
+    f3(f3In) shouldEqual f3Out
+    f3In = Right(Right(false))
+    f3Out = Right(false)
+    f3(f3In) shouldEqual f3Out
   }
 }
