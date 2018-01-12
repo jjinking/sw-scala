@@ -185,5 +185,78 @@ object Ch3Ex2 {
     case Right(Left(b)) => Left(Right(b))
     case Right(Right(c)) => Right(c)
   }
+}
+
+object Ch3Ex3 {
+
+  // Problem 1
+  sealed trait MyTU[T, U]
+  final case class EmptyValuesTU[T, U]() extends MyTU[T, U]
+  final case class TAndU[T, U](t: T, u: U) extends MyTU[T, U]
+  final case class IntAndT[T, U](i: Int, t: T) extends MyTU[T, U]
+  final case class StringAndU[T, U](s: String, u: U) extends MyTU[T, U]
+
+  // Problem 2
+  // Show that A ⇒ (B + C) != (A ⇒ B) + (A ⇒ C) in logic
+  // forward (=>)
+  // def p2Forward[A, B, C](fOfA: A => Either[B, C]): Either[A => B, A => C] = {
+  //   // Need to produce either A => B or A => C and must now decide which one!
+  //   // Suppose we decide to produce Left(A => B)
+  //   Left((a: A) => fOfA(a))
+  //   // However, this doesn't work since fOfA(a) returns Either[B, C], not B
+  // }
+  // We can't decide whether to return Left[A => B] or Right[A => C] without first
+  // evaluating fOfA(a)
+
+  // backward (<=) works
+  // def p2Backward[A, B, C](abOrAc: Either[A => B, A => C]): A => Either[B, C] = abOrAc match {
+  //   case Left(l: (A => B)) => { a => Left(l(a))  }
+  //   case Right(r: (A => C)) => { a => Right(r(a))  }
+  // }
+
+  // Problem 3
+  // (A * Int) + ((A * Char) + (A * Float))
+  // = (A * Int) + (A * Char) + (A * Float)
+  // = A * (Int + Char + Float)
+  type P3T1[A] = Either[(A, Int), Either[(A, Char), (A, Float)]]
+  type P3T2[A] = (A, IntOrCharOrFloat)
+
+  sealed trait IntOrCharOrFloat
+  final case class ItsInt(i: Int) extends IntOrCharOrFloat
+  final case class ItsChar(c: Char) extends IntOrCharOrFloat
+  final case class ItsFloat(f: Float) extends IntOrCharOrFloat
+
+  def p3Forward[A]: P3T1[A] => P3T2[A] = {
+    case Left((a, i)) => (a, ItsInt(i))
+    case Right(aCharFloat) => aCharFloat match {
+      case Left((a, c)) => (a, ItsChar(c))
+      case Right((a, f)) => (a, ItsFloat(f))
+    }
+  }
+
+  def p3Backward[A]: P3T2[A] => P3T1[A] = {
+    case (a, ItsInt(i)) => Left((a, i))
+    case (a, ItsChar(c)) => Right(Left((a, c)))
+    case (a, ItsFloat(f)) => Right(Right((a, f)))
+  }
+
+  // Problem 4
+  sealed trait OptEither[A, B]
+  final case class OptNone[A, B]() extends OptEither[A, B]
+  final case class OptLeft[A, B](a: A) extends OptEither[A, B]
+  final case class OptRight[A, B](b: B) extends OptEither[A, B]
+
+  def map[A, B, T](oe: OptEither[A, B])(f: B => T): OptEither[A, T] = oe match {
+    case OptRight(b) => OptRight(f(b))
+    case OptLeft(a) => OptLeft(a)
+    case OptNone() => OptNone()
+  }
+
+  def flatMap[A, B, T](oe: OptEither[A, B])(f: B => OptEither[A, T]): OptEither[A, T] = oe match {
+    case OptRight(b) => f(b)
+    case OptLeft(a) => OptLeft(a)
+    case OptNone() => OptNone()
+  }
+
 
 }

@@ -1,10 +1,13 @@
 package swscala.unit
 
+import org.scalacheck.Arbitrary
+import org.scalacheck.ScalacheckShapeless._
 import org.scalatest._
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import swscala._
 
 
-class Ch3Spec extends FlatSpec with Matchers {
+class Ch3Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   "Ch3Ex1" should "pass all tests" in {
 
@@ -95,4 +98,40 @@ class Ch3Spec extends FlatSpec with Matchers {
     f3Out = Right(false)
     f3(f3In) shouldEqual f3Out
   }
+
+  "Ch3Ex3" should "pass all tests" in {
+
+    import Ch3Ex3._
+
+    // Problem 1
+    "val myTUEmpty: MyTU[String, Int] = EmptyValuesTU[String, Int]" should compile
+    """val myTUAnd: MyTU[String, Boolean] = TAndU[String, Boolean]("a", true)""" should compile
+    """val myTUIntAndT: MyTU[String, Boolean] = IntAndT[String, Boolean](1, "hello")""" should compile
+    """val myTUStringAndU: MyTU[String, Boolean] = StringAndU[String, Boolean]("s", false)""" should compile
+
+    // Problem 2
+    """def p2Forward[A, B, C](fOfA: A => Either[B, C]): Either[A => B, A => C] = {
+         Left((a: A) => fOfA(a))
+    }""" shouldNot typeCheck
+
+    // Problem 3
+    def p3Check[A: Arbitrary]() = {
+      forAll { (p3T1: P3T1[A]) => p3Backward(p3Forward(p3T1)) shouldEqual p3T1  }
+      forAll { (p3T2: P3T2[A]) => p3Forward(p3Backward(p3T2)) shouldEqual p3T2  }
+    }
+    p3Check[String]()
+
+    // Problem 4
+    def p4Check[A: Arbitrary, B: Arbitrary]() = {
+      forAll { (x: OptEither[A, B]) => map[A, B, B](x)(identity[B]) shouldEqual x  }
+      forAll { (x: OptEither[A, B]) => flatMap[A, B, B](x)((b: B) => OptRight(b)) shouldEqual x }
+
+      // Verify for equivalent type Either[Option[A], B]
+      forAll { (x: Either[Option[A], B]) => x.map(identity[B]) shouldEqual x  }
+      forAll { (x: Either[Option[A], B]) => x.flatMap((b: B) => Right(b)) shouldEqual x  }
+    }
+    p4Check[String, Boolean]
+
+  }
+
 }
