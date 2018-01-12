@@ -1,7 +1,7 @@
 package swscala
 
 
-object Ch3Exercises {
+object Ch3Ex1 {
 
   /**
     Problem 1
@@ -124,4 +124,66 @@ object Ch3Exercises {
     def s[...]:... = (f: B => C) ⇒ (g: A => B) ⇒ g(x: A ⇒ f(g(x:A):B):C)
     g: A => C contradicts with A => B, therefore not well typed
     */
+}
+
+object Ch3Ex2 {
+
+  // Problem 1
+  sealed trait CellState {
+    def isBomb: Boolean = this match {
+      case BombCell() => true
+      case _ => false
+    }
+  }
+
+  final case class ClosedCell() extends CellState
+  final case class BombCell() extends CellState
+  final case class OpenCell(neighborBombs: Int) extends CellState
+
+  // Problem 2
+  def numCellsShowingZeroNeighborBombs(cells: Seq[Seq[CellState]]): Int = {
+    cells.flatten.count {
+      _ match {
+        case OpenCell(0) => true
+        case _ => false
+      }
+    }
+  }
+
+  // Problem 3
+  sealed trait RootOfLinear
+  final case class NoRoot() extends RootOfLinear
+  final case class OneRoot(x: Double) extends RootOfLinear
+  final case class AllXRoots() extends RootOfLinear
+  def solve1(a: Double, b: Double): RootOfLinear = (a, b) match {
+    case (0, 0) => AllXRoots()
+    case (0, _) => NoRoot()
+    case (a, b) => OneRoot(-b / a)
+  }
+
+  // Problem 4
+  def solve1(pairs: Seq[(Double, Double)]): Seq[Double] = {
+    pairs.map{ case (a, b) => solve1(a, b) }.flatMap {
+      _ match {
+        case OneRoot(x) => Some(x)
+        case _ => None
+      }
+    }
+  }
+
+  // Problem 5
+  def f1[A, B](ab: Option[(A, B)]): (Option[A], Option[B]) =
+    ab.map{case (a, b) => (Some(a), Some(b))}.getOrElse((None, None))
+
+  def f2[A, B](aXorB: Either[A,B]): (Option[A], Option[B]) = aXorB match {
+    case Left(a) => (Some(a), None)
+    case Right(b) => (None, Some(b))
+  }
+
+  def f3[A,B,C](abc: Either[A, Either[B,C]]): Either[Either[A,B], C] = abc match {
+    case Left(a) => Left(Left(a))
+    case Right(Left(b)) => Left(Right(b))
+    case Right(Right(c)) => Right(c)
+  }
+
 }
