@@ -119,7 +119,7 @@ class Ch3Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
       forAll { (p3T1: P3T1[A]) => p3Backward(p3Forward(p3T1)) shouldEqual p3T1  }
       forAll { (p3T2: P3T2[A]) => p3Forward(p3Backward(p3T2)) shouldEqual p3T2  }
     }
-    p3Check[String]()
+    p3Check[String]
 
     // Problem 4
     def p4Check[A: Arbitrary, B: Arbitrary]() = {
@@ -156,11 +156,17 @@ class Ch3Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
     }
     p5Check[String, Int]
 
-    // // Problem 6.1
-    // def p6Check[S: Arbitrary, A: Arbitrary]() = {
-    //   forAll { (x: P6State[S, A]) => p6Map(x)((s, a) => (s, a)) shouldEqual x }
-    // }
-    // p6Check[String, Int]
+    // Problem 6.1
+    // Doesn't work
+    def p6Check[S: Arbitrary, A: Arbitrary]() = {
+      forAll {
+        (x: P6State[S, A]) => {
+          p6P1Map(x)(identity[(S, A)]) shouldEqual x
+        }
+      }
+    }
+    p6Check[String, Int]
+
 
 
   }

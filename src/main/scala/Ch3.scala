@@ -283,13 +283,28 @@ object Ch3Ex3 {
     case StringAndU(s, u) => StringAndU(s, u)
   }
 
-  // // Problem 6.1
-  // type P6State[S, A] = S ⇒ (A, S)
-  // def p6Map[S, A, B](sa: P6State[S, A])(f: (S, A) ⇒ (S, B)): P6State[S, B] = { s =>
-  //   val (a, s2) = sa(s)
-  //   val (s3, b) = f(s2, a)
-  //   (b, s3)
-  // }
+  // Problem 6.1
+  type P6State[S, A] = S ⇒ (A, S)
+  def p6P1Map[S, A, B](sa: P6State[S, A])(f: ((S, A)) ⇒ (S, B)): P6State[S, B] = { s =>
+    val (a, s2) = sa(s)
+    val (s3, b) = f((s2, a))
+    (b, s3)
+  }
 
+  // Problem 6.2
+  // A + Z ⇒  (A ⇒  B) ⇒  B + Z
+  def p6P2Map[A, B, Z](az: (A, Z))(aToB: A => B): (B, Z) = (aToB(az._1), az._2)
+
+  // A + Z ⇒  B + Z ⇒  (A ⇒  B ⇒  C) ⇒  C + Z
+  def p6P2Map2[A, B, C, Z](az: (A, Z))(bz: (B, Z))(aToBToC: A => B => C): (C, Z) = {
+    val (a, z1) = az
+    val (b, z2) = bz
+    val c = aToBToC(a)(b)
+    (c, z2)
+  }
+
+  // // Problem 6.3
+  // // flatMap[E, A, B]: Reader[E, A] ⇒  (A ⇒ Reader[E, B]) ⇒ Reader[E, B]
+  // def p6P3FlatMap[E, A, B]()
 
 }
