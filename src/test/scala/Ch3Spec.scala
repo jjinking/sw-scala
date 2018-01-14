@@ -12,7 +12,7 @@ class Ch3Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
   "Ch3Ex1" should "pass all tests" in {
 
     import Ch3Ex1._
-    
+
     // Problem 1
     id(id[Int])(3) shouldEqual 3
     val int2Str = (x: Int) => x.toString
@@ -132,6 +132,36 @@ class Ch3Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
     }
     p4Check[String, Boolean]
 
-  }
+    // Problem 5
+    def p5Check[T: Arbitrary, U: Arbitrary]() = {
+      // Checking that map for MyT doesn't lose information
+      forAll {
+        (x: MyT[T], b: Boolean, s: String) => {
+          val mappedMyTVals: MyTVals[T] = mapMyT(x)(identity[T])(b)
+          x(b) match {
+            case StringToT(sToT) => {
+              mappedMyTVals match {
+                // sToT is a function, so we must evaluate it for comparison
+                case StringToT(sToTMapped) => sToT(s) shouldEqual sToTMapped(s)
+                case _ => fail()
+              }
+            }
+            case otherMyT@_ => otherMyT shouldEqual mappedMyTVals
+          }
+        }
+      }
 
+      // Checking that map for MyTU dosn't lose information
+      forAll { (x: MyTU[T, U]) => mapMyTU(x)(identity[T]) shouldEqual x }
+    }
+    p5Check[String, Int]
+
+    // // Problem 6.1
+    // def p6Check[S: Arbitrary, A: Arbitrary]() = {
+    //   forAll { (x: P6State[S, A]) => p6Map(x)((s, a) => (s, a)) shouldEqual x }
+    // }
+    // p6Check[String, Int]
+
+
+  }
 }

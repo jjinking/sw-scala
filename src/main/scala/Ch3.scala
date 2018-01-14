@@ -258,5 +258,38 @@ object Ch3Ex3 {
     case OptNone() => OptNone()
   }
 
+  // Problem 5
+  type MyT[T] = Boolean ⇒ MyTVals[T]
+  sealed trait MyTVals[T]
+  final case class EmptyValueT[T]() extends MyTVals[T]
+  final case class SingleValueT[T](t: T) extends MyTVals[T]
+  final case class IntWithT[T](i: Int, t: T) extends MyTVals[T]
+  final case class StringToT[T](st: String ⇒ T) extends MyTVals[T]
+
+  def mapMyT[T, U](myT: MyT[T])(f: T => U): MyT[U] = b => {
+    myT(b) match {
+      case EmptyValueT() => EmptyValueT()
+      case SingleValueT(t) => SingleValueT(f(t))
+      case IntWithT(i, t) => IntWithT(i, f(t))
+      case StringToT(sToT) => StringToT(s => f(sToT(s)))
+    }
+  }
+
+  // Map for MyTU preferring T over U
+  def mapMyTU[T, U, V](myTU: MyTU[T, U])(f: T => V): MyTU[V, U] = myTU match {
+    case EmptyValuesTU() => EmptyValuesTU()
+    case TAndU(t, u) => TAndU(f(t), u)
+    case IntAndT(i, t) => IntAndT(i, f(t))
+    case StringAndU(s, u) => StringAndU(s, u)
+  }
+
+  // // Problem 6.1
+  // type P6State[S, A] = S ⇒ (A, S)
+  // def p6Map[S, A, B](sa: P6State[S, A])(f: (S, A) ⇒ (S, B)): P6State[S, B] = { s =>
+  //   val (a, s2) = sa(s)
+  //   val (s3, b) = f(s2, a)
+  //   (b, s3)
+  // }
+
 
 }
