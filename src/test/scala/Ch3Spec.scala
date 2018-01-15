@@ -157,17 +157,46 @@ class Ch3Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
     p5Check[String, Int]
 
     // Problem 6.1
-    // Doesn't work
-    def p6Check[S: Arbitrary, A: Arbitrary]() = {
+    def p6P1Check[S: Arbitrary, A: Arbitrary]()(implicit arbPsa: Arbitrary[P6State[S, A]]) = {
       forAll {
-        (x: P6State[S, A]) => {
-          p6P1Map(x)(identity[(S, A)]) shouldEqual x
+        (x: P6State[S, A], s: S) => {
+          p6P1Map(x)(identity[(S, A)])(s) shouldEqual x(s)
         }
       }
     }
-    p6Check[String, Int]
+    p6P1Check[String, Int]
 
+    // Problem 6.2
+    def p6P2Check[A: Arbitrary, B: Arbitrary, Z: Arbitrary]() = {
+      forAll {
+        (az: (A, Z), bz: (B, Z)) => {
+          p6P2Map2(az)(bz)(a => b => a) shouldEqual (az._1, bz._2)
+          p6P2Map2(az)(bz)(a => b => b) shouldEqual bz
+        }
+      }
+    }
+    p6P2Check[String, Int, Boolean]
 
+    // Problem 6.3
+    def p6P3Check[E: Arbitrary, A: Arbitrary]()(implicit arbREA: Arbitrary[Reader[E, A]]) = {
+      forAll {
+        (r: Reader[E, A], e: E) => {
+          p6P3FlatMap(r)(a => e2 => a)(e) shouldEqual r(e)
+        }
+      }
+    }
+    p6P3Check[String, Int]
+
+    // Problem 7
+    def p7Check[Z: Arbitrary, A: Arbitrary]()(implicit arbD: Arbitrary[Density[Z, A]], arbAToZ: Arbitrary[A => Z]) = {
+      forAll {
+        (dza: Density[Z, A], aToZ: A => Z) => {
+          p7P1Map(dza)(identity[A])(aToZ) shouldEqual dza(aToZ)
+          p7P2FlatMap(dza){a => aToZ2:(A => Z) => a}(aToZ) shouldEqual dza(aToZ)
+        }
+      }
+    }
+    p7Check[String, Int]
 
   }
 }

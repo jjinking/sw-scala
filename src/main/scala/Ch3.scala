@@ -303,8 +303,50 @@ object Ch3Ex3 {
     (c, z2)
   }
 
-  // // Problem 6.3
-  // // flatMap[E, A, B]: Reader[E, A] ⇒  (A ⇒ Reader[E, B]) ⇒ Reader[E, B]
-  // def p6P3FlatMap[E, A, B]()
+  // Problem 6.3
+  // flatMap[E, A, B]: Reader[E, A] ⇒  (A ⇒ Reader[E, B]) ⇒  Reader[E, B]
+  type Reader[E, T] = E ⇒  T
+  def p6P3FlatMap[E, A, B](r: Reader[E, A])(fOfA: (A ⇒ Reader[E, B])): Reader[E, B] = { e =>
+    val a: A = r(e)
+    val rEB: Reader[E, B] = fOfA(a)
+    rEB(e)
+  }
+
+  // Problem 7.1
+  type Density[Z, T] = (T => Z) ⇒  T
+  def p7P1Map[Z, A, B](dza: Density[Z, A])(fAToB: (A => B)): Density[Z, B] = { fBToZ: (B => Z) =>
+    // Simplified version:
+    // fAToB(dza(a => fBToZ(fAToB(a))))
+    // Long version
+    val fAToZ: (A => Z) = (a : A) => fBToZ(fAToB(a))
+    val a = dza(fAToZ)
+    val b = fAToB(a)
+    b // need to return type B
+  }
+
+  // Problem 7.2
+  def p7P2FlatMap[Z, A, B](dza: Density[Z, A])(aToDzb: (A => Density[Z, B])): Density[Z, B] = { (bToZ: B => Z) =>
+    // dza: (A => Z) => A
+    // aToDzb: (A => ((B => Z) => B))
+    // bToZ: B => Z
+    val aToZ: A => Z = (a: A) => bToZ(aToDzb(a)(bToZ))
+    val a: A = dza(aToZ)
+    val dzb: Density[Z, B] = aToDzb(a)
+    val b: B = dzb(bToZ)
+    // must return type B
+    b
+  }
+
+  // Problem 8.1 Cannot implement
+  type Cont[R, T] = (T => R) => R
+  // val p8P1Map[R, T, U]: Cont[R, T] ⇒ (T => U) => Cont[R, U] = { tToR: (T => R) => r: R => tToU: (T => U) => uToR: (U => R) =>
+  //   val t: T = ???
+  //   val u: U = tToU(t)
+  //   val r: R = uToR(u)
+  //   r // need to return type R
+  // }
+
+  //type p8P2FlatMap[R, T, U] = ContR,T ⇒ (T ⇒ ContR,U) ⇒ ContR,U
+
 
 }
