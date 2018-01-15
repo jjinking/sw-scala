@@ -357,5 +357,14 @@ object Ch3Ex3 {
     r // need to return type R
   }
 
+  // Problem 9
+  // Tr3[A] ≡ 1 + A × A × A × Tr3[A]
+  sealed trait Tr3[A]
+  final case class Tr3Nil[A]() extends Tr3[A]
+  final case class Tr3Vals[A](a1: A, a2: A, a3: A, rest: Tr3[A]) extends Tr3[A]
 
+  def p9Map[A, B](tr3: Tr3[A])(f: A => B): Tr3[B] = tr3 match {
+    case Tr3Nil() => Tr3Nil()
+    case Tr3Vals(a1, a2, a3, rest) => Tr3Vals(f(a1), f(a2), f(a3), p9Map(rest)(f))
+  }
 }

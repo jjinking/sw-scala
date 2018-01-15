@@ -155,6 +155,8 @@ class Ch3Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
       forAll { (x: MyTU[T, U]) => mapMyTU(x)(identity[T]) shouldEqual x }
     }
     p5Check[String, Int]
+    p5Check[Int, Boolean]
+    p5Check[Boolean, String]
 
     // Problem 6.1
     def p6P1Check[S: Arbitrary, A: Arbitrary]()(implicit arbPsa: Arbitrary[P6State[S, A]]) = {
@@ -170,6 +172,7 @@ class Ch3Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
     def p6P2Check[A: Arbitrary, B: Arbitrary, Z: Arbitrary]() = {
       forAll {
         (az: (A, Z), bz: (B, Z)) => {
+          p6P2Map(az)(identity[A]) shouldEqual az
           p6P2Map2(az)(bz)(a => b => a) shouldEqual (az._1, bz._2)
           p6P2Map2(az)(bz)(a => b => b) shouldEqual bz
         }
@@ -207,6 +210,16 @@ class Ch3Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
         }
       }
     }
+    p8Check[String, Int]
 
+    // Problem 9
+    def p9Check[A: Arbitrary]() = {
+      forAll {
+        (tr3: Tr3[A]) => {
+          p9Map(tr3)(identity[A]) shouldEqual tr3
+        }
+      }
+    }
+    p9Check[Boolean]
   }
 }
