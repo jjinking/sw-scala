@@ -191,12 +191,22 @@ class Ch3Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
     def p7Check[Z: Arbitrary, A: Arbitrary]()(implicit arbD: Arbitrary[Density[Z, A]], arbAToZ: Arbitrary[A => Z]) = {
       forAll {
         (dza: Density[Z, A], aToZ: A => Z) => {
-          p7P1Map(dza)(identity[A])(aToZ) shouldEqual dza(aToZ)
-          p7P2FlatMap(dza){a => aToZ2:(A => Z) => a}(aToZ) shouldEqual dza(aToZ)
+          p7Map(dza)(identity[A])(aToZ) shouldEqual dza(aToZ)
+          p7FlatMap(dza){a => aToZ2:(A => Z) => a}(aToZ) shouldEqual dza(aToZ)
         }
       }
     }
     p7Check[String, Int]
+
+    // Problem 8
+    def p8Check[R: Arbitrary, T: Arbitrary]()(implicit arbC: Arbitrary[Cont[R, T]], arbTToR: Arbitrary[T => R]) = {
+      forAll {
+        (contRT: Cont[R, T], tToR: T => R) => {
+          p8Map(contRT)(identity[T])(tToR) shouldEqual contRT(tToR)
+          p8FlatMap(contRT){t => tToR2:(T => R) => tToR2(t)}(tToR) shouldEqual contRT(tToR)
+        }
+      }
+    }
 
   }
 }

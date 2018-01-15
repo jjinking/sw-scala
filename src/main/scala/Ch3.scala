@@ -314,7 +314,7 @@ object Ch3Ex3 {
 
   // Problem 7.1
   type Density[Z, T] = (T => Z) ⇒  T
-  def p7P1Map[Z, A, B](dza: Density[Z, A])(fAToB: (A => B)): Density[Z, B] = { fBToZ: (B => Z) =>
+  def p7Map[Z, A, B](dza: Density[Z, A])(fAToB: (A => B)): Density[Z, B] = { fBToZ: (B => Z) =>
     // Simplified version:
     // fAToB(dza(a => fBToZ(fAToB(a))))
     // Long version
@@ -325,7 +325,7 @@ object Ch3Ex3 {
   }
 
   // Problem 7.2
-  def p7P2FlatMap[Z, A, B](dza: Density[Z, A])(aToDzb: (A => Density[Z, B])): Density[Z, B] = { (bToZ: B => Z) =>
+  def p7FlatMap[Z, A, B](dza: Density[Z, A])(aToDzb: (A => Density[Z, B])): Density[Z, B] = { (bToZ: B => Z) =>
     // dza: (A => Z) => A
     // aToDzb: (A => ((B => Z) => B))
     // bToZ: B => Z
@@ -337,16 +337,25 @@ object Ch3Ex3 {
     b
   }
 
-  // Problem 8.1 Cannot implement
+  // Problem 8.1
   type Cont[R, T] = (T => R) => R
-  // val p8P1Map[R, T, U]: Cont[R, T] ⇒ (T => U) => Cont[R, U] = { tToR: (T => R) => r: R => tToU: (T => U) => uToR: (U => R) =>
-  //   val t: T = ???
-  //   val u: U = tToU(t)
-  //   val r: R = uToR(u)
-  //   r // need to return type R
-  // }
+  def p8Map[R, T, U]: Cont[R, T] ⇒ (T => U) => Cont[R, U] = { contRT => tToU => uToR =>
+    // contRT: (T => R) => R
+    // tToU: T => U
+    // uToR: U => R
+    val tToR: T => R = (t: T) => uToR(tToU(t))
+    val r: R = contRT(tToR)
+    r // need to return type R
+  }
 
-  //type p8P2FlatMap[R, T, U] = ContR,T ⇒ (T ⇒ ContR,U) ⇒ ContR,U
+  def p8FlatMap[R, T, U]: Cont[R, T] ⇒ (T ⇒ Cont[R, U]) ⇒ Cont[R, U] = { contRT => f => uToR =>
+    // contRT: (T => R) => R
+    // f: T => (U => R) => R
+    // uToR: U => R
+    val tToR: T => R = (t: T) => f(t)(uToR)
+    val r: R = contRT(tToR)
+    r // need to return type R
+  }
 
 
 }
