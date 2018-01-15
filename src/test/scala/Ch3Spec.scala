@@ -170,11 +170,19 @@ class Ch3Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
 
     // Problem 6.2
     def p6P2Check[A: Arbitrary, B: Arbitrary, Z: Arbitrary]() = {
+      // Test p6P2Map
+      forAll { (az: Either[A, Z]) => p6P2Map(az)(identity[A]) shouldEqual az }
+
+      // Test p6P2Map2
       forAll {
-        (az: (A, Z), bz: (B, Z)) => {
-          p6P2Map(az)(identity[A]) shouldEqual az
-          p6P2Map2(az)(bz)(a => b => a) shouldEqual (az._1, bz._2)
-          p6P2Map2(az)(bz)(a => b => b) shouldEqual bz
+        (az: Either[A, Z], bz: Either[B, Z]) => {
+          az match {
+            case Left(a) => bz match {
+              case Left(b) => p6P2Map2(az)(bz)(a => b => a) shouldEqual az
+              case Right(z) => p6P2Map2(az)(bz)(a => b => a) shouldEqual bz
+            }
+            case Right(z) => p6P2Map2(az)(bz)(a => b => a) shouldEqual az
+          }
         }
       }
     }

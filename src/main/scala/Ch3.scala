@@ -293,14 +293,17 @@ object Ch3Ex3 {
 
   // Problem 6.2
   // A + Z ⇒  (A ⇒  B) ⇒  B + Z
-  def p6P2Map[A, B, Z](az: (A, Z))(aToB: A => B): (B, Z) = (aToB(az._1), az._2)
-
+  def p6P2Map[A, B, Z](az: Either[A, Z])(aToB: A => B): Either[B, Z] = az match {
+    case Left(a) => Left(aToB(a))
+    case Right(z) => Right(z)
+  }
   // A + Z ⇒  B + Z ⇒  (A ⇒  B ⇒  C) ⇒  C + Z
-  def p6P2Map2[A, B, C, Z](az: (A, Z))(bz: (B, Z))(aToBToC: A => B => C): (C, Z) = {
-    val (a, z1) = az
-    val (b, z2) = bz
-    val c = aToBToC(a)(b)
-    (c, z2)
+  def p6P2Map2[A, B, C, Z](az: Either[A, Z])(bz: Either[B, Z])(aToBToC: A => B => C): Either[C, Z] = az match {
+    case Left(a) => bz match {
+      case Left(b) => Left(aToBToC(a)(b))
+      case Right(z) => Right(z)
+    }
+    case Right(z) => Right(z)
   }
 
   // Problem 6.3
