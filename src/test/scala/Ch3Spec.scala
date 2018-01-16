@@ -1,15 +1,18 @@
 package swscala.unit
 
+import org.scalacheck.Arbitrary
+import org.scalacheck.ScalacheckShapeless._
 import org.scalatest._
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import swscala._
 
 
-class Ch3Spec extends FlatSpec with Matchers {
+class Ch3Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   "Ch3Ex1" should "pass all tests" in {
 
     import Ch3Ex1._
-    
+
     // Problem 1
     id(id[Int])(3) shouldEqual 3
     val int2Str = (x: Int) => x.toString
@@ -94,5 +97,137 @@ class Ch3Spec extends FlatSpec with Matchers {
     f3In = Right(Right(false))
     f3Out = Right(false)
     f3(f3In) shouldEqual f3Out
+  }
+
+  "Ch3Ex3" should "pass all tests" in {
+
+    import Ch3Ex3._
+
+    // Problem 1
+    "val myTUEmpty: MyTU[String, Int] = EmptyValuesTU[String, Int]" should compile
+    """val myTUAnd: MyTU[String, Boolean] = TAndU[String, Boolean]("a", true)""" should compile
+    """val myTUIntAndT: MyTU[String, Boolean] = IntAndT[String, Boolean](1, "hello")""" should compile
+    """val myTUStringAndU: MyTU[String, Boolean] = StringAndU[String, Boolean]("s", false)""" should compile
+
+    // Problem 2
+    """def p2Forward[A, B, C](fOfA: A => Either[B, C]): Either[A => B, A => C] = {
+         Left((a: A) => fOfA(a))
+    }""" shouldNot typeCheck
+
+    // Problem 3
+    def p3Check[A: Arbitrary]() = {
+      forAll { (p3T1: P3T1[A]) => p3Backward(p3Forward(p3T1)) shouldEqual p3T1  }
+      forAll { (p3T2: P3T2[A]) => p3Forward(p3Backward(p3T2)) shouldEqual p3T2  }
+    }
+    p3Check[String]
+
+    // Problem 4
+    def p4Check[A: Arbitrary, B: Arbitrary]() = {
+      forAll { (x: OptEither[A, B]) => map[A, B, B](x)(identity[B]) shouldEqual x  }
+      forAll { (x: OptEither[A, B]) => flatMap[A, B, B](x)((b: B) => OptRight(b)) shouldEqual x }
+
+      // Verify for equivalent type Either[Option[A], B]
+      forAll { (x: Either[Option[A], B]) => x.map(identity[B]) shouldEqual x  }
+      forAll { (x: Either[Option[A], B]) => x.flatMap((b: B) => Right(b)) shouldEqual x  }
+    }
+    p4Check[String, Boolean]
+
+    // Problem 5
+    def p5Check[T: Arbitrary, U: Arbitrary]() = {
+      // Checking that map for MyT doesn't lose information
+      forAll {
+        (x: MyT[T], b: Boolean, s: String) => {
+          val mappedMyTVals: MyTVals[T] = mapMyT(x)(identity[T])(b)
+          x(b) match {
+            case StringToT(sToT) => {
+              mappedMyTVals match {
+                // sToT is a function, so we must evaluate it for comparison
+                case StringToT(sToTMapped) => sToT(s) shouldEqual sToTMapped(s)
+                case _ => fail()
+              }
+            }
+            case otherMyT@_ => otherMyT shouldEqual mappedMyTVals
+          }
+        }
+      }
+
+      // Checking that map for MyTU dosn't lose information
+      forAll { (x: MyTU[T, U]) => mapMyTU(x)(identity[T]) shouldEqual x }
+    }
+    p5Check[String, Int]
+    p5Check[Int, Boolean]
+    p5Check[Boolean, String]
+
+    // Problem 6.1
+    def p6P1Check[S: Arbitrary, A: Arbitrary]()(implicit arbPsa: Arbitrary[P6State[S, A]]) = {
+      forAll {
+        (x: P6State[S, A], s: S) => {
+          p6P1Map(x)(identity[(S, A)])(s) shouldEqual x(s)
+        }
+      }
+    }
+    p6P1Check[String, Int]
+
+    // Problem 6.2
+    def p6P2Check[A: Arbitrary, B: Arbitrary, Z: Arbitrary]() = {
+      // Test p6P2Map
+      forAll { (az: Either[A, Z]) => p6P2Map(az)(identity[A]) shouldEqual az }
+
+      // Test p6P2Map2
+      forAll {
+        (az: Either[A, Z], bz: Either[B, Z]) => {
+          az match {
+            case Left(a) => bz match {
+              case Left(b) => p6P2Map2(az)(bz)(a => b => a) shouldEqual az
+              case Right(z) => p6P2Map2(az)(bz)(a => b => a) shouldEqual bz
+            }
+            case Right(z) => p6P2Map2(az)(bz)(a => b => a) shouldEqual az
+          }
+        }
+      }
+    }
+    p6P2Check[String, Int, Boolean]
+
+    // Problem 6.3
+    def p6P3Check[E: Arbitrary, A: Arbitrary]()(implicit arbREA: Arbitrary[Reader[E, A]]) = {
+      forAll {
+        (r: Reader[E, A], e: E) => {
+          p6P3FlatMap(r)(a => e2 => a)(e) shouldEqual r(e)
+        }
+      }
+    }
+    p6P3Check[String, Int]
+
+    // Problem 7
+    def p7Check[Z: Arbitrary, A: Arbitrary]()(implicit arbD: Arbitrary[Density[Z, A]], arbAToZ: Arbitrary[A => Z]) = {
+      forAll {
+        (dza: Density[Z, A], aToZ: A => Z) => {
+          p7Map(dza)(identity[A])(aToZ) shouldEqual dza(aToZ)
+          p7FlatMap(dza){a => aToZ2:(A => Z) => a}(aToZ) shouldEqual dza(aToZ)
+        }
+      }
+    }
+    p7Check[String, Int]
+
+    // Problem 8
+    def p8Check[R: Arbitrary, T: Arbitrary]()(implicit arbC: Arbitrary[Cont[R, T]], arbTToR: Arbitrary[T => R]) = {
+      forAll {
+        (contRT: Cont[R, T], tToR: T => R) => {
+          p8Map(contRT)(identity[T])(tToR) shouldEqual contRT(tToR)
+          p8FlatMap(contRT){t => tToR2:(T => R) => tToR2(t)}(tToR) shouldEqual contRT(tToR)
+        }
+      }
+    }
+    p8Check[String, Int]
+
+    // Problem 9
+    def p9Check[A: Arbitrary]() = {
+      forAll {
+        (tr3: Tr3[A]) => {
+          p9Map(tr3)(identity[A]) shouldEqual tr3
+        }
+      }
+    }
+    p9Check[Boolean]
   }
 }
