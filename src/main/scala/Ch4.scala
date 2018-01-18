@@ -33,4 +33,31 @@ object Ch4Ex1 {
     P2Data(dB)
   }
 
+  // Problem 3
+  // Data[A, B] ≡ (A ⇒ String) × ((A + B) ⇒ Int)
+  // Contravariant
+  type P3Data[A, B] = ((A ⇒ String), (Either[A, B] ⇒ Int))
+
+  // B => C
+  def p3ContraFmapBC[A, B, C](f: C => B): P3Data[A, B] => P3Data[A, C] = { p3DAB =>
+    val (aToString, aOrBToInt) = p3DAB
+    val aOrCToInt: Either[A, C] => Int = {
+      case Left(a) => aOrBToInt(Left(a))
+      case Right(c) => aOrBToInt(Right(f(c)))
+    }
+    (aToString, aOrCToInt)
+  }
+
+  // A => C
+  def p3ContraFmapAC[A, B, C](f: C => A): P3Data[A, B] => P3Data[C, B] = { p3DAB =>
+    val (aToString, aOrBToInt) = p3DAB
+    val cToString: C => String = c => aToString(f(c))
+    val cOrBToInt: Either[C, B] => Int = {
+      case Left(c) => aOrBToInt(Left(f(c)))
+      case Right(b) => aOrBToInt(Right(b))
+    }
+    (cToString, cOrBToInt)
+  }
+
+
 }
