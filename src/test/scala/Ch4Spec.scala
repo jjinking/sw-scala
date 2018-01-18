@@ -79,6 +79,51 @@ class Ch4Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
       )
     }
 
+    // Problem 5
+    def p5DataEqual[B](d1: P5Data[B], d2: P5Data[B]) = {
+      val (bOrIntToB1, bOrStrToB1) = d1
+      val (bOrIntToB2, bOrStrToB2) = d2
+
+      forAll { (i: Int) =>
+        bOrIntToB1 match {
+          case Left(b1) => bOrIntToB2 match {
+            case Left(b2) => b1 shouldEqual b2
+            case Right(_) => fail
+          }
+          case Right(intToB1) => bOrIntToB2 match {
+            case Left(_) => fail
+            case Right(intToB2) => intToB1(i) shouldEqual intToB2(i)
+          }
+        }
+      }
+
+      forAll { (s: String) =>
+        bOrStrToB1 match {
+          case Left(b1) => bOrStrToB2 match {
+            case Left(b2) => b1 shouldEqual b2
+            case Right(_) => fail
+          }
+          case Right(strToB1) => bOrStrToB2 match {
+            case Left(_) => fail
+            case Right(strToB2) => strToB1(s) shouldEqual strToB2(s)
+          }
+        }
+      }
+    }
+
+    // Identity Law
+    forAll { (x: P5Data[String]) ⇒ p5DataEqual(p5Fmap(identity[String])(x), x) }
+
+    // Composition Law
+    forAll { (x: P5Data[Boolean], f: Boolean ⇒ Int, g: Int ⇒ String) ⇒
+      p5DataEqual(
+        p5Fmap(f andThen g)(x),
+        (p5Fmap(f) andThen p5Fmap(g))(x)
+      )
+    }
+
+
+
   }
 
 }

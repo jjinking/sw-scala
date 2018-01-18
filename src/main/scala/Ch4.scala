@@ -14,6 +14,7 @@ object Ch4Ex1 {
     P1Data(p1DA.d1.map(f), p1DA.d2.map(f), p1DA.d3)
   }
 
+
   // Problem 2
   // Data[A] ≡ (A ⇒ String) ⇒ (A × (Int + A))
   // Covariant
@@ -32,6 +33,7 @@ object Ch4Ex1 {
     }
     P2Data(dB)
   }
+
 
   // Problem 3
   // Data[A, B] ≡ (A ⇒ String) × ((A + B) ⇒ Int)
@@ -59,5 +61,34 @@ object Ch4Ex1 {
     (cToString, cOrBToInt)
   }
 
+
+  // Problem 4
+  // Data[A] ≡ (1 + (A ⇒ String)) ⇒ (1 + (A ⇒ Int)) ⇒ Int
+  // Neither covariant nor contravariant
+  // type P4Data[A] = Some[A ⇒ String] ⇒ Some[A ⇒ Int] ⇒ Int
+
+  // The following will fail:
+  // import io.chymyst.ch._
+  // def p4Fmap[A, B](f: A => B): P4Data[A] => P4Data[B] = implement
+  // def p4ContraFmap[A, B](f: B => A): P4Data[A] => P4Data[B] = implement
+
+
+  // Problem 5
+  // Data[B] ≡ (B + (Int ⇒ B)) × (B + (String ⇒ B))
+  // Covariant
+  type P5Data[B] = (Either[B, Int => B], Either[B, String => B])
+
+  def p5Fmap[B, C](f: B => C): P5Data[B] => P5Data[C] = { p5DB =>
+    val (bOrIntToB, bOrStrToB) = p5DB
+    val cOrIntToC: Either[C, Int => C] = bOrIntToB match {
+      case Left(b) => Left(f(b))
+      case Right(intToB) => Right(i => f(intToB(i)))
+    }
+    val cOrStrToC: Either[C, String => C] = bOrStrToB match {
+      case Left(b) => Left(f(b))
+      case Right(strToB) => Right(s => f(strToB(s)))
+    }
+    (cOrIntToC, cOrStrToC)
+  }
 
 }
