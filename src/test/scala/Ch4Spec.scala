@@ -22,7 +22,24 @@ class Ch4Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
 
 
     // Problem 2
-    "def p2Fmap[A, B](f: A => B): P2Data[A] => P2Data[B] = implement" shouldNot typeCheck
+    def p2DataEqual[A](d1: P2Data[A], d2: P2Data[A]) = {
+      val aToString: A => String = a => a.toString
+      val (a1, iOrA1) = d1.d(aToString)
+      val (a2, iOrA2) = d2.d(aToString)
+      a1 shouldEqual a2
+      iOrA1 shouldEqual iOrA2
+    }
+
+    // Identity law.
+    forAll { (x: P2Data[Int]) ⇒ p2DataEqual(p2Fmap(identity[Int])(x), x) }
+
+    // Composition law.
+    forAll { (x: P2Data[Int], f: Int ⇒ String, g: String ⇒ Long) ⇒
+      p2DataEqual(
+        p2Fmap(f andThen g)(x),
+        (p2Fmap(f) andThen p2Fmap(g))(x)
+      )
+    }
 
 
   }
