@@ -64,31 +64,55 @@ object Ch4Ex1 {
 
   // Problem 4
   // Data[A] ≡ (1 + (A ⇒ String)) ⇒ (1 + (A ⇒ Int)) ⇒ Int
-  // Neither covariant nor contravariant
-  // type P4Data[A] = Some[A ⇒ String] ⇒ Some[A ⇒ Int] ⇒ Int
-
-  // The following will fail:
+  // Covariant
+  // The following will pass:
+  // final case class P4Data[A](d: Option[A ⇒ String] ⇒ Option[A ⇒ Int] ⇒ Int)
   // import io.chymyst.ch._
   // def p4Fmap[A, B](f: A => B): P4Data[A] => P4Data[B] = implement
-  // def p4ContraFmap[A, B](f: B => A): P4Data[A] => P4Data[B] = implement
-
+  // not pass: def p4ContraFmap[A, B](f: B => A): P4Data[A] => P4Data[B] = implement
+//-type P4Data[A] = Option[A => String] => Option[A => Int] => Int
+//-
+//-def p4Fmap[A, B](f: A => B): P4Data[A] => P4Data[B] = { optAToString => optAToInt => i =>
+//-  // optAToString: Option[A => String]
+//-  // optAToInt: Option[A => Int]
+//-  // i: int
+//-  val dB: Option[B ⇒ String] ⇒ Option[B ⇒ Int] ⇒ Int = { optBToString => optBToInt =>
+//-    // optBToString: Option[B => String]
+//-    // optBToInt: Option[B => Int]
+//-
+//-
+//-    // Must return integer
+//-  }
+//-  dB
+//-}
 
   // Problem 5
   // Data[B] ≡ (B + (Int ⇒ B)) × (B + (String ⇒ B))
   // Covariant
-  type P5Data[B] = (Either[B, Int => B], Either[B, String => B])
+  //type P5Data[B] = (Either[B, Int => B], Either[B, String => B])
+  type P5Data[B] = (BOrXToB[B, Int], BOrXToB[B, String])
+
+  // BOrXToB is covariant wrt B since it's not consumed
+  type BOrXToB[B, X] = Either[B, X => B]
+
+  def mapBOrXToB[B, C, X](f: B => C): BOrXToB[B, X] => BOrXToB[C, X] = {
+    case Left(b) => Left(f(b))
+    case Right(xToB) => Right(x => f(xToB(x)))
+  }
 
   def p5Fmap[B, C](f: B => C): P5Data[B] => P5Data[C] = { p5DB =>
     val (bOrIntToB, bOrStrToB) = p5DB
-    val cOrIntToC: Either[C, Int => C] = bOrIntToB match {
-      case Left(b) => Left(f(b))
-      case Right(intToB) => Right(i => f(intToB(i)))
-    }
-    val cOrStrToC: Either[C, String => C] = bOrStrToB match {
-      case Left(b) => Left(f(b))
-      case Right(strToB) => Right(s => f(strToB(s)))
-    }
-    (cOrIntToC, cOrStrToC)
+    // val cOrIntToC: Either[C, Int => C] = bOrIntToB match {
+    //   case Left(b) => Left(f(b))
+    //   case Right(intToB) => Right(i => f(intToB(i)))
+    // }
+    // val cOrStrToC: Either[C, String => C] = bOrStrToB match {
+    //   case Left(b) => Left(f(b))
+    //   case Right(strToB) => Right(s => f(strToB(s)))
+    // }
+    // (cOrIntToC, cOrStrToC)
+    (mapBOrXToB(f)(bOrIntToB), mapBOrXToB(f)(bOrStrToB))
+
   }
 
 }

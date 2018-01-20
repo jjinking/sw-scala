@@ -80,6 +80,38 @@ class Ch4Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
     }
 
     // Problem 5
+
+    // Check equality of BOrXToB[B, X]
+    def bOrXToBEqual[B, X](
+      d1: BOrXToB[B, X], d2: BOrXToB[B, X]
+    )(implicit arbX: Arbitrary[X]) = {
+      forAll { (x: X) =>
+        d1 match {
+          case Left(b1) => d2 match {
+            case Left(b2) => b1 shouldEqual b2
+            case Right(_) => fail
+          }
+          case Right(xToB1) => d2 match {
+            case Left(_) => fail
+            case Right(xToB2) => xToB1(x) shouldEqual xToB2(x)
+          }
+        }
+      }
+    }
+
+    // Identity Law for mapBOrXToB
+    forAll { (x: BOrXToB[Int, String]) ⇒
+      bOrXToBEqual(mapBOrXToB[Int, Int, String](identity[Int])(x), x) }
+
+    // Composition Law for mapBOrXToB
+    forAll { (x: BOrXToB[Int, Boolean], f: Int ⇒ String, g: String ⇒ Long) ⇒
+      bOrXToBEqual(
+        mapBOrXToB[Int, Long, Boolean](f andThen g)(x),
+        (mapBOrXToB[Int, String, Boolean](f) andThen mapBOrXToB(g))(x)
+      )
+    }
+
+    // Check equality of P4Data[B]
     def p5DataEqual[B](d1: P5Data[B], d2: P5Data[B]) = {
       val (bOrIntToB1, bOrStrToB1) = d1
       val (bOrIntToB2, bOrStrToB2) = d2
