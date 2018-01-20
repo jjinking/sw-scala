@@ -79,6 +79,7 @@ class Ch4Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
       )
     }
 
+
     // Problem 5
 
     // Check equality of BOrXToB[B, X]
