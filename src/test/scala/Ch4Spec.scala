@@ -80,6 +80,30 @@ class Ch4Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
     }
 
 
+    // Problem 4
+    def p4DataEqual[A](d1: P4Data[A], d2: P4Data[A])(
+      implicit arbOAToStr: Arbitrary[Option[A => String]],
+      arbOAToInt: Arbitrary[Option[A => Int]]
+    ) = forAll {
+      (oAToStr: Option[A => String], oAToInt: Option[A => Int]) => {
+        d1(oAToStr)(oAToInt) shouldEqual d2(oAToStr)(oAToInt)
+      }
+    }
+
+    // Identity law
+    forAll { (x: P4Data[String]) =>
+      p4DataEqual(p4Fmap(identity[String])(x), x)
+    }
+
+    // Composition law
+    forAll { (x: P4Data[Int], f: Int ⇒ String, g: String ⇒ Boolean) ⇒
+      p4DataEqual(
+        p4Fmap[Int, Boolean](f andThen g)(x),
+        (p4Fmap(f) andThen p4Fmap(g))(x)
+      )
+    }
+
+
     // Problem 5
 
     // Check equality of BOrXToB[B, X]
@@ -100,15 +124,15 @@ class Ch4Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
       }
     }
 
-    // Identity Law for mapBOrXToB
+    // Identity Law for fmapBOrXToB
     forAll { (x: BOrXToB[Int, String]) ⇒
-      bOrXToBEqual(mapBOrXToB[Int, Int, String](identity[Int])(x), x) }
+      bOrXToBEqual(fmapBOrXToB[Int, Int, String](identity[Int])(x), x) }
 
-    // Composition Law for mapBOrXToB
+    // Composition Law for fmapBOrXToB
     forAll { (x: BOrXToB[Int, Boolean], f: Int ⇒ String, g: String ⇒ Long) ⇒
       bOrXToBEqual(
-        mapBOrXToB[Int, Long, Boolean](f andThen g)(x),
-        (mapBOrXToB[Int, String, Boolean](f) andThen mapBOrXToB(g))(x)
+        fmapBOrXToB[Int, Long, Boolean](f andThen g)(x),
+        (fmapBOrXToB[Int, String, Boolean](f) andThen fmapBOrXToB(g))(x)
       )
     }
 
@@ -156,7 +180,16 @@ class Ch4Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
     }
 
 
+    // Problem 6
+    import io.chymyst.ch._
+    // works
+    def fmapCoi1[A, B, C](f: A => C): Coi[A, B] => Coi[C, B] = implement
+    // fails
+    // def contraFmapCoi1[A, B, C](f: C => A): Coi[A, B] => Coi[C, B] = implement
 
+    // // both fail
+    // def fmapCoi2[A, B, C](f: B => C): Coi[A, B] => Coi[A, C] = implement
+    // def contraFmapCoi2[A, B, C](f: C => B): Coi[A, B] => Coi[A, C] = implement
   }
 
 }

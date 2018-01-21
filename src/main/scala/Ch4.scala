@@ -71,25 +71,36 @@ object Ch4Ex1 {
   // def p4Fmap[A, B](f: A => B): P4Data[A] => P4Data[B] = implement
   // not pass: def p4ContraFmap[A, B](f: B => A): P4Data[A] => P4Data[B] = implement
   type P4Data[A] = Option[A => String] => Option[A => Int] => Int
+  def p4Fmap[A, B](f: A => B): P4Data[A] => P4Data[B] = { p4DataA =>
+    // p4DataA: Option[A => String] => Option[A => Int] => Int
 
-  def p4Fmap[A, B](f: A => B): P4Data[A] => P4Data[B] = { optAToString => optAToInt => i =>
-    // optAToString: Option[A => String]
-    // optAToInt: Option[A => Int]
-    // i: Int
-    val dB: Option[B ⇒ String] ⇒ Option[B ⇒ Int] ⇒ Int = { optBToString => optBToInt =>
+    val p4DataB: Option[B ⇒ String] ⇒ Option[B ⇒ Int] ⇒ Int = { optBToString => optBToInt =>
       // optBToString: Option[B => String]
       // optBToInt: Option[B => Int]
 
-      val b: B = ???
-      
+      // First produce Option[A => Int] => Int using p4DataA and optBToString
+      val optToIntA: Option[A => Int] => Int = optBToString match {
+        case Some(bToStr) => {
+          val aToStr: A => String = a => bToStr(f(a))
+          p4DataA(Some(aToStr))
+        }
+        case None => {
+          p4DataA(None)
+        }
+      }
+
+      // Second produce Int from optBToInt using optToIntA and optBToInt
       val i2: Int = optBToInt match {
-        case Some(bToInt) => bToInt(b)
-        case None => optAToInt(None)
+        case Some(bToInt) => {
+          val aToInt: A => Int = a => bToInt(f(a))
+          optToIntA(Some(aToInt))
+        }
+        case None => optToIntA(None)
       }
       // Must return integer
       i2
     }
-    dB
+    p4DataB
   }
 
 
@@ -101,14 +112,26 @@ object Ch4Ex1 {
   // Sub-structure is covariant wrt B since it's not consumed
   type BOrXToB[B, X] = Either[B, X => B]
 
-  def mapBOrXToB[B, C, X](f: B => C): BOrXToB[B, X] => BOrXToB[C, X] = {
+  def fmapBOrXToB[B, C, X](f: B => C): BOrXToB[B, X] => BOrXToB[C, X] = {
     case Left(b) => Left(f(b))
     case Right(xToB) => Right(x => f(xToB(x)))
   }
 
   def p5Fmap[B, C](f: B => C): P5Data[B] => P5Data[C] = { p5DB =>
     val (bOrIntToB, bOrStrToB) = p5DB
-    (mapBOrXToB(f)(bOrIntToB), mapBOrXToB(f)(bOrStrToB))
+    (fmapBOrXToB(f)(bOrIntToB), fmapBOrXToB(f)(bOrStrToB))
   }
+
+
+  // Problem 6
+  // Short notation:
+  // Data[A, B] ≡ ((A x B) x (B => Int)) + (A x B x Int) + ((String => A) x (B => A))
+  // A is never consumed, so it is covariant
+  // B behaves like a functor in case class `Re` but is consumed in the others,
+  // so it's invariant
+  sealed trait Coi[+A, B]
+  case class Pa[+A, B](b: (A, B), c: B⇒Int) extends Coi[A, B]
+  case class Re[+A, B](d: A, e: B, c: Int) extends Coi[A, B]
+  case class Ci[+A, B](f: String⇒A, g: B⇒A) extends Coi[A, B]
 
 }
