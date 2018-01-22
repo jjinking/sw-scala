@@ -135,3 +135,34 @@ object Ch4Ex1 {
   case class Ci[+A, B](f: String⇒A, g: B⇒A) extends Coi[A, B]
 
 }
+
+
+object Ch4Ex2 {
+
+  /**
+    Problem 1
+
+    Given functors F[A] and G[A] prove F[A] x G[A] is also a functor
+    We know following functions exist: fmapF(f): F[A] => F[B] and fmapG(f): G[A] => G[B]
+
+    Define fmap<FxG>[A, B](f: A => B) = (p: F[A], q: G[A]) => (fmapF(f)(p), fmapG(f)(q))
+
+    Check identity
+    fmap(id[A])((p, q)) = (fmapF(id[A])(p), fmapG(id[A])(q)) = (p, q)
+
+    Check composition
+    (fmap<FxG>(f1) ◦ fmap<FxG>(f2))(p, q)
+    = fmap(f2)(fmapF(f1)(p), fmapG(f1)(q))
+    = ((fmapF(f1) ◦ fmapF(f2))(p), (fmapG(f1) ◦ fmapG(f2))(q)
+    = (fmapF(f1 ◦ f2)(p), fmapG(f1 ◦ f2)(q))
+    = fmap(f1 ◦ f2)(p, q)
+    */
+
+  /**
+    Problem 2
+
+    
+
+
+    */
+}
