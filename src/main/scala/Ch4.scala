@@ -159,20 +159,20 @@ object Ch4Ex2 {
     */
 
   // Problem 2
-  type FToG[A] = F[A] => G[A]
-  // functor
-  type F[A] = Option[A]
-  // functor
-  type G[A] = (A, Int)
+  // type FToG[A] = F[A] => G[A]
+  // // functor
+  // type F[A] = Option[A]
+  // // functor
+  // type G[A] = (A, Int)
 
-  def fmapF[A, B](f: A => B): Option[A] => Option[B] = {
-    case Some(a) => Some(f(a))
-    case None => None
-  }
+  // def fmapF[A, B](f: A => B): Option[A] => Option[B] = {
+  //   case Some(a) => Some(f(a))
+  //   case None => None
+  // }
 
-  def fmapG[A, B](f: A => B): (A, Int) => (B, Int) = {
-    case (a, i) => (f(a), i)
-  }
+  // def fmapG[A, B](f: A => B): (A, Int) => (B, Int) = {
+  //   case (a, i) => (f(a), i)
+  // }
 
   // Cannot implement fmap
   // def fmapFToG[A, B](f: A => B): FToG[A] => FToG[B] = { fToGA =>
