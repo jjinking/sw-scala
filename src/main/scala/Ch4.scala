@@ -158,11 +158,47 @@ object Ch4Ex2 {
     = fmap(f1 ◦ f2)(p, q)
     */
 
-  /**
-    Problem 2
+  // Problem 2
+  type FToG[A] = F[A] => G[A]
+  // functor
+  type F[A] = Option[A]
+  // functor
+  type G[A] = (A, Int)
 
-    
+  def fmapF[A, B](f: A => B): Option[A] => Option[B] = {
+    case Some(a) => Some(f(a))
+    case None => None
+  }
 
+  def fmapG[A, B](f: A => B): (A, Int) => (B, Int) = {
+    case (a, i) => (f(a), i)
+  }
 
-    */
+  // Cannot implement fmap
+  // def fmapFToG[A, B](f: A => B): FToG[A] => FToG[B] = { fToGA =>
+  //   val fToGB: FToG[B] = (fB: F[B]) => {
+  //     val bToA: B => A = ??? // Need a function that maps B to A
+  //     val fA: F[A] = fmapF[B, A](bToA)(fB) // or we need contraFmapF[B, A](f)(fB)
+  //     val gA: G[A] = fToGA(fA)
+  //     val gB: G[B] = fmapG(f)(gA)
+  //     gB
+  //   }
+  //   fToGB
+  // }
+
+  // Cannot implement contraFmap
+  // def contraFmapFToG[A, B](f: B => A): FToG[A] => FToG[B] = { fToGA =>
+  //   val fToGB: FToG[B] = (fB: F[B]) => {
+  //     val fA: F[A] = fmapF[B, A](f)(fB)
+  //     val gA: G[A] = fToGA(fA)
+  //     val aToB: A => B = a => ???  // There is no correct way to produce a value of type B
+  //     val gB: G[B] = fmapG(aToB)(gA)
+  //     gB
+  //   }
+  //   fToGB
+  // }
+
+  // Since we cannot implement fmap for FToG[A], it is not a functor
+  // and since we cannot implement contrafmap, it is not a contrafunctor
+
 }
