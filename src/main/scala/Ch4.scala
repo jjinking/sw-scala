@@ -125,14 +125,13 @@ object Ch4Ex1 {
 
   // Problem 6
   // Short notation:
-  // Data[A, B] ≡ ((A x B) x (B => Int)) + (A x B x Int) + ((String => A) x (B => A))
-  // A is never consumed, so it is covariant
-  // B behaves like a functor in case class `Re` but is consumed in the others,
-  // so it's invariant
-  sealed trait Coi[+A, B]
-  case class Pa[+A, B](b: (A, B), c: B⇒Int) extends Coi[A, B]
-  case class Re[+A, B](d: A, e: B, c: Int) extends Coi[A, B]
-  case class Ci[+A, B](f: String⇒A, g: B⇒A) extends Coi[A, B]
+  // Result[A, B] = (A x B x C) + ((Int => A) x (Int => B)) + (A => A, A => B)
+  // A is both consumed and produced, so it is invariant
+  // B is never consumed, so it is covariant
+  sealed trait Result[A, +B]
+  case class P[A, +B](a: A, b: B, c: Int) extends Result[A,B]
+  case class Q[A, +B](d: Int⇒A, e: Int⇒B) extends Result[A,B]
+  case class R[A, +B](f: A⇒A, g: A⇒B) extends Result[A,B]
 
 }
 

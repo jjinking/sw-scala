@@ -182,14 +182,18 @@ class Ch4Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
 
     // Problem 6
     import io.chymyst.ch._
-    // works
-    def fmapCoi1[A, B, C](f: A => C): Coi[A, B] => Coi[C, B] = implement
-    // fails
-    // def contraFmapCoi1[A, B, C](f: C => A): Coi[A, B] => Coi[C, B] = implement
 
-    // // both fail
-    // def fmapCoi2[A, B, C](f: B => C): Coi[A, B] => Coi[A, C] = implement
-    // def contraFmapCoi2[A, B, C](f: C => B): Coi[A, B] => Coi[A, C] = implement
+    // Checking Param A
+    // fails
+    // def fmapResult1[A, B, C](f: A => C): Result[A, B] => Result[C, B] = implement
+    // fails
+    // def contraFmapResult1[A, B, C](f: C => A): Result[A, B] => Result[C, B] = implement
+
+    // Checking Param B
+    // works, but curry howard lib will give compile time error due to inequivalent implementations
+    // def fmapResult1[A, B, C](f: B => C): Result[A, B] => Result[A, C] = implement
+    // fails
+    //def contraFmapResult2[A, B, C](f: C => B): Result[A, B] => Result[A, C] = implement
   }
 
 }
