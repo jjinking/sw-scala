@@ -201,4 +201,39 @@ object Ch4Ex2 {
   // Since we cannot implement fmap for FToG[A], it is not a functor
   // and since we cannot implement contrafmap, it is not a contrafunctor
 
+  /**
+    Problem 3
+    Give functor F[A] and contrafunctor G[A], show that F[A] => G[A] is a contrafunctor
+    Following functions exist:
+    fmapF[A, B](f: A => B): F[A] => F[B]
+    contrafmapG[A, B](f: B => A): G[A] => G[B]
+
+    Define contrafmap as follows:
+    contrafmap<F=>G>(f: B => A)(p: F[A] => G[A]) = (q: F[B]) => contrafmapG(f)(p(fmapF(f)(q)))
+
+    Check identity
+    contrafmap(id[A])(p: F[A] => G[A]) = (q: F[A]) => contrafmapG(f)(p(fmapF(f)(q)))
+                                       = (q) => p(q) = p
+
+    Check composition
+    contrafmap(f1) ◦ contrafmap(f2)(p: F[A] => G[A])
+    = contrafmap(f2)((qx) => contrafmapG(f1)(p(fmapF(f1)(qx))))
+    = qy => contrafmapG(f2)(r(fmapF(f2)(qy)))
+
+    where
+    r = qx => contrafmapG(f1)(p(fmapF(f1)(qx)))
+    r(fmapF(f2)(qy)) = contrafmapG(f1)(p(fmapF(f1)(fmapF(f2)(qy))))
+
+    substituting this back in,
+    qy => contrafmapG(f2)(contrafmapG(f1)(p(fmapF(f1)(fmapF(f2)(qy)))))
+
+    fmapF(f1)(fmapF(f2)(qy)) = fmapF(f2) ◦ fmapF(f1)(qy)
+                             = fmapF(f2 ◦ f1)(qy)
+    contrafmapG(f2)(contrafmapG(f1)(x)) = contrafmapG(f1) ◦ contrafmapG(f2)(x)
+                                        = contrafmapG(f2 ◦ f1)(x)
+
+    putting these together:
+    qy => contrafmapG(f2 ◦ f1)(p(fmapF(f2 ◦ f1)(qy)))
+    = contrafmap(f2 ◦ f1)(p)
+    */
 }
