@@ -184,16 +184,20 @@ class Ch4Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks 
     import io.chymyst.ch._
 
     // Checking Param A
-    // fails
-    // def fmapResult1[A, B, C](f: A => C): Result[A, B] => Result[C, B] = implement
-    // fails
-    // def contraFmapResult1[A, B, C](f: C => A): Result[A, B] => Result[C, B] = implement
+    // 0 possible implementations
+    def allFmapsA[A, B, C] = allOfType[(A => C) => Result[A, B] => Result[C, B]]
+    // 0 possible implementations
+    def allContraFmapsA[A, B, C] = allOfType[(C => A) => Result[A, B] => Result[C, B]]
 
     // Checking Param B
-    // works, but curry howard lib will give compile time error due to inequivalent implementations
+    // > 0 possible implementations
+    def allFmapsB[A, B, C] = allOfType[(B => C) => Result[A, B] => Result[A, C]]
+    allFmapsB[Int, String, Boolean].length should be > 0
     // def fmapResult1[A, B, C](f: B => C): Result[A, B] => Result[A, C] = implement
-    // fails
-    //def contraFmapResult2[A, B, C](f: C => B): Result[A, B] => Result[A, C] = implement
+
+    // 0 possible implementations
+    def allContraFmapsB[A, B, C] = allOfType[(C => B) => Result[A, B] => Result[A, C]]
+    allContraFmapsB[Int, String, Boolean].length shouldEqual 0
   }
 
 }
