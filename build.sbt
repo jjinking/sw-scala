@@ -25,7 +25,7 @@ version := "0.1"
 // Want to use a published library in your project?
 // You can define other libraries as dependencies in your build like this:
 libraryDependencies += "io.chymyst" %% "curryhoward" % "latest.integration"
-libraryDependencies += "org.typelevel" %% "cats" % "0.9.0"
+libraryDependencies += "org.typelevel" %% "cats-core" % "1.0.0"
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.4" % Test
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % Test
 libraryDependencies += "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.6" % Test
