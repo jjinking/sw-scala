@@ -34,7 +34,18 @@ object Ch5 {
         }
       }
     }
+  }
 
+  object Problem3 {
+    // If A is a monoid and R any type, define monoid instance for R ⇒ A
+    implicit def monoidRToAInstance[R, A](
+      implicit evA: Monoid[A]
+    ): Monoid[R => A] = new Monoid[R => A] {
+
+      override def empty: R => A = r => evA.empty
+
+      override def combine(x: R => A, y: R => A): R => A = r => evA.combine(x(r), y(r))
+    }
   }
 
 
