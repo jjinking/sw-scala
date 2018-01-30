@@ -1,6 +1,7 @@
 package swscala
 
-import cats.Monoid
+import scala.concurrent.Future
+import cats.{Functor, Monoid, Semigroup}
 
 object Ch5 {
 
@@ -48,6 +49,31 @@ object Ch5 {
     }
   }
 
+  object Problem4 {
+    // Show: If S is a semigroup then Option[S] is a monoid
+    implicit def monoidInstance[S](implicit evS: Semigroup[S]): Monoid[Option[S]] = new Monoid[Option[S]] {
+      override def empty: Option[S] = None
+
+      override def combine(x: Option[S], y: Option[S]): Option[S] = x match {
+        case Some(s1) => y match {
+          case Some(s2) => Some(evS.combine(s1, s2))
+          case None => Some(s1)
+        }
+        case None => y
+      }
+    }
+  }
+
+  object Problem5 {
+    import scala.concurrent.ExecutionContext.Implicits.global
+
+    // Define a functor instance for type F[T] = Future[Seq[T]]
+    type F[T] = Future[Seq[T]]
+
+    implicit val fFunctorInstance: Functor[F] = new Functor[F] {
+      override def map[A, B](fa: F[A])(f: A => B): F[B] = fa.map(_.map(f))
+    }
+  }
 
 
 }
