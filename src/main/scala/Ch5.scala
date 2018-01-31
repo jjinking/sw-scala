@@ -1,7 +1,8 @@
 package swscala
 
+import io.chymyst.ch._
 import scala.concurrent.Future
-import cats.{Functor, Monoid, Semigroup}
+import cats.{Bifunctor, Functor, Monoid, Semigroup}
 
 object Ch5 {
 
@@ -57,9 +58,9 @@ object Ch5 {
       override def combine(x: Option[S], y: Option[S]): Option[S] = x match {
         case Some(s1) => y match {
           case Some(s2) => Some(evS.combine(s1, s2))
-          case None => Some(s1)
+          case _ => Some(s1)
         }
-        case None => y
+        case _ => y
       }
     }
   }
@@ -72,6 +73,44 @@ object Ch5 {
 
     implicit val fFunctorInstance: Functor[F] = new Functor[F] {
       override def map[A, B](fa: F[A])(f: A => B): F[B] = fa.map(_.map(f))
+    }
+  }
+
+  object Problem6 {
+    // Define a Cats Bifunctor instance for B[X,Y] ≡ (Int ⇒ X) + Y × Y
+    type B[X,Y] = Either[(Int => X), (Y, Y)]
+
+    implicit val bifunctorInstance = new Bifunctor[B] {
+      override def bimap[A, B, C, D](
+        fab: Either[(Int => A), (B, B)]
+      )(f: A ⇒ C, g: B ⇒ D): Either[(Int => C), (D, D)] = implement
+    }
+  }
+
+  object Problem7 {
+
+    trait Profunctor[F[_]] {
+      def dimap[A, B](f: A ⇒ B, g: B ⇒ A): F[A] ⇒ F[B]
+    }
+
+    type P[A] = A ⇒ (Int, A)
+
+    implicit val profunctorPInstance = new Profunctor[P] {
+      override def dimap[A, B](f: A ⇒ B, g: B ⇒ A): P[A] ⇒ P[B] = implement
+    }
+  }
+
+  object Problem8 {
+    // Q[A] = Either[String, (A, Q[A])]
+    sealed trait Q[A]
+    final case class C1[A](s: String) extends Q[A]
+    final case class C2[A](a: A, q: Q[A]) extends Q[A]
+
+    implicit val qFunctorInstance: Functor[Q] = new Functor[Q] {
+      override def map[A, B](qa: Q[A])(f: A => B): Q[B] = qa match {
+        case C1(s) => C1(s)
+        case C2(a, q) => C2(f(a), map(q)(f))
+      }
     }
   }
 

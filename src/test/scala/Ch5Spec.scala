@@ -1,13 +1,15 @@
 package swscala.unit
 
 import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
-import cats.{Monoid, Semigroup}
+//import scala.concurrent.duration._
+import cats.{Functor, Monoid, Semigroup}
 import org.scalacheck.Arbitrary
+import org.scalacheck.ScalacheckShapeless._
 import org.scalatest._
+import org.scalatest.concurrent.ScalaFutures
 import swscala._
 
-class Ch5Spec extends FlatSpec with Matchers with CatsLawChecking {
+class Ch5Spec extends FlatSpec with Matchers with CatsLawChecking with ScalaFutures {
   import Ch5._
 
   it should "Problem 1" in {
@@ -63,19 +65,74 @@ class Ch5Spec extends FlatSpec with Matchers with CatsLawChecking {
     checkCatsMonoidLaws[Option[Int]]()
   }
 
-  it should "Problem 5" in {
-    import Problem5._
-    import scala.concurrent.ExecutionContext.Implicits.global
+  // it should "Problem 5" in {
+  //   import Problem5._
+  //   import scala.concurrent.ExecutionContext.Implicits.global
 
-    def dataIsEqual[T](f1: Future[Seq[T]], f2: Future[Seq[T]])(implicit arbT: Arbitrary[T]): Assertion = {
-      Await.result(f1, 1 second) shouldEqual Await.result(f2, 1 second)
-      // for {
-      //   r1 <- f1
-      //   r2 <- f2
-      // } yield r1 shouldEqual r2
+  //   def dataIsEqual[T](f1: F[T], f2: F[T]): Assertion = {
+  //     //f1.futureValue shouldEqual f2.futureValue
+  //     //Await.result(f1, 1 second) shouldEqual Await.result(f2, 1 second)
+
+  //     // val foo = {for {
+  //     //   r1 <- f1
+  //     //   r2 <- f2
+  //     // } yield r1 shouldEqual r2}
+  //     // Await.result(foo, 1 second)
+
+  //     whenReady(f1) { r1 =>
+  //       whenReady(f2) { r2 =>
+  //         r1 shouldEqual r2
+  //       }
+  //     }
+
+  //     // import util._
+  //     // f1.onComplete {
+  //     //   case Success(r1) => f2.onComplete {
+  //     //     case Success(r2) => r1 shouldEqual r2
+  //     //     case _ => fail
+  //     //   }
+  //     //   case _ => fail
+  //     // }
+  //   }
+
+  //   checkCatsFunctorLaws[F, Int, String, Boolean](dataIsEqual[Boolean])
+  // }
+
+  it should "Problem 6" in {
+    import Problem6._
+
+    def dataIsEqual[X, Y](x: B[X, Y], y: B[X, Y]): Assertion = x match {
+      case Left(iToX1) => y match {
+        case Left(iToX2) => forAll { (i: Int) => iToX1(i) shouldEqual iToX2(i) }
+        case _ => fail
+      }
+      case Right(bb1) => y match {
+        case Right(bb2) => bb1 shouldEqual bb2
+        case _ => fail
+      }
     }
 
-    checkCatsFunctorLaws[F, Int, String, Boolean](dataIsEqual)
+    checkCatsBifunctorLaws[B, Int, String, Boolean, Char, Long, Double](dataIsEqual)
+  }
+
+  it should "Problem 8" in {
+    import Problem8._
+
+    def qEqual[T](q1: Q[T], q2: Q[T]): Assertion = q1 match {
+      case C1(s1) => q2 match {
+        case C1(s2) => s1 shouldEqual s2
+        case _ => fail
+      }
+      case C2(a1, qq1) => q2 match {
+        case C2(a2, qq2) => {
+          a1 shouldEqual a2
+          qEqual(qq1, qq2)
+        }
+        case _ => fail
+      }
+    }
+
+    checkCatsFunctorLaws[Q, Int, String, Long](qEqual)
   }
 
 }
