@@ -2,11 +2,12 @@ package swscala.unit
 
 import scala.concurrent.{Await, Future}
 //import scala.concurrent.duration._
-import cats.{Functor, Monoid, Semigroup}
 import org.scalacheck.Arbitrary
 import org.scalacheck.ScalacheckShapeless._
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
+import cats.{Contravariant, Functor, Monoid, Semigroup}
+import io.chymyst.ch._
 import swscala._
 
 class Ch5Spec extends FlatSpec with Matchers with CatsLawChecking with ScalaFutures {
@@ -133,6 +134,52 @@ class Ch5Spec extends FlatSpec with Matchers with CatsLawChecking with ScalaFutu
     }
 
     checkCatsFunctorLaws[Q, Int, String, Long](qEqual)
+  }
+
+  it should "Problem 9" in {
+    import Problem9._
+
+    // Create Functor instances for some simple data types.
+    type D1[T] = (T, Int)
+    type D2[T] = Either[T, String]
+    implicit val d1FunctorInstance = new Functor[D1] {
+      override def map[A, B](fa: (A, Int))(f: A ⇒ B): (B, Int) = implement
+    }
+    implicit val d2FunctorInstance = new Functor[D2] {
+      override def map[A, B](fa: Either[A, String])(f: A ⇒ B): Either[B, String] = implement
+    }
+
+    // Check functor laws for D1 x D2.
+    type D1AndD2[T] = (D1[T], D2[T])
+    checkCatsFunctorLaws[D1AndD2, Double, Boolean, Short]()
+  }
+
+  it should "Problem 10" in {
+    import Problem10._
+
+    // Create contrafunctor instance
+    type D1[T] = T => Int
+    implicit val contraFunctorInstance = new Contravariant[D1] {
+      override def contramap[A, B](fa: A ⇒ Int)(f: B => A): B ⇒ Int = implement
+    }
+    // Create functor instance
+    type D2[T] = Int => T
+    implicit val functorInstance = new Functor[D2] {
+      override def map[A, B](da: D2[A])(f: A => B): D2[B] = implement
+    }
+
+    // Check functor laws for FtoG
+    type D1toD2[T] = D1[T] => D2[T]
+
+    def dataIsEqual[T](x: D1toD2[T], y: D1toD2[T])(
+      implicit arbD1: Arbitrary[D1[T]]
+    ): Assertion = {
+      forAll { (d1: D1[T], i: Int) =>
+        x(d1)(i) shouldEqual y(d1)(i)
+      }
+    }
+
+    checkCatsFunctorLaws[D1toD2, Double, Boolean, Short](dataIsEqual)
   }
 
 }

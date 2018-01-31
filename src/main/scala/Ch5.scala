@@ -1,8 +1,8 @@
 package swscala
 
-import io.chymyst.ch._
 import scala.concurrent.Future
-import cats.{Bifunctor, Functor, Monoid, Semigroup}
+import cats.{Bifunctor, Contravariant, Functor, Monoid, Semigroup}
+import io.chymyst.ch._
 
 object Ch5 {
 
@@ -114,5 +114,35 @@ object Ch5 {
     }
   }
 
+  object Problem9 {
+    // If F[A] and G[A] are functors, define functor instance for F[A] x G[A]
+    implicit def fgFunctorInstance[F[_], G[_]](
+      implicit evF: Functor[F], evG: Functor[G]
+    ): Functor[λ[X ⇒ (F[X], G[X])]] = {
 
+      // Define the new functor as a type here, for convenience.
+      type FAndG[T] = (F[T], G[T])
+
+      new Functor[FAndG] {
+        override def map[A, B](fga: FAndG[A])(t: A ⇒ B): FAndG[B] =
+          (evF.map(fga._1)(t), evG.map(fga._2)(t))
+      }
+    }
+  }
+
+  object Problem10 {
+    // F[A]: Contravariant, G[A] is a functor
+    implicit def fToGFunctorInstance[F[_], G[_]](
+      implicit evF: Contravariant[F], evG: Functor[G]
+    ): Functor[λ[X ⇒ F[X] => G[X]]] = {
+
+      type FtoG[T] = F[T] => G[T]
+
+      new Functor[FtoG] {
+        override def map[A, B](fga: FtoG[A])(t: A => B): FtoG[B] = { (fb: F[B]) =>
+          evG.map(fga(evF.contramap(fb)(t)))(t)
+        }
+      }
+    }
+  }
 }
