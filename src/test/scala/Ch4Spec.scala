@@ -6,7 +6,6 @@ import org.scalatest._
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import swscala._
 
-
 class Ch4Spec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   "Ch4Ex1" should "pass all tests" in {
