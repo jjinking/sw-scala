@@ -65,6 +65,7 @@ object Ch5 {
     }
   }
 
+  // $COVERAGE-OFF$
   object Problem5 {
     import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -75,6 +76,7 @@ object Ch5 {
       override def map[A, B](fa: F[A])(f: A => B): F[B] = fa.map(_.map(f))
     }
   }
+  // $COVERAGE-ON$
 
   object Problem6 {
     // Define a Cats Bifunctor instance for B[X,Y] ≡ (Int ⇒ X) + Y × Y
@@ -87,6 +89,7 @@ object Ch5 {
     }
   }
 
+  // $COVERAGE-OFF$
   object Problem7 {
 
     trait Profunctor[F[_]] {
@@ -99,6 +102,7 @@ object Ch5 {
       override def dimap[A, B](f: A ⇒ B, g: B ⇒ A): P[A] ⇒ P[B] = implement
     }
   }
+  // $COVERAGE-ON$
 
   object Problem8 {
     // Q[A] = Either[String, (A, Q[A])]

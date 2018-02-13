@@ -66,39 +66,39 @@ class Ch5Spec extends FlatSpec with Matchers with CatsLawChecking with ScalaFutu
     checkCatsMonoidLaws[Option[Int]]()
   }
 
-  it should "Problem 5" in {
-    import Problem5._
-    import scala.concurrent.ExecutionContext.Implicits.global
+  // it should "Problem 5" in {
+  //   import Problem5._
+  //   import scala.concurrent.ExecutionContext.Implicits.global
 
-    def dataIsEqual[T](f1: F[T], f2: F[T]): Assertion = {
-      //f1.futureValue shouldEqual f2.futureValue
-      //Await.result(f1, 1 second) shouldEqual Await.result(f2, 1 second)
+  //   def dataIsEqual[T](f1: F[T], f2: F[T]): Assertion = {
+  //     //f1.futureValue shouldEqual f2.futureValue
+  //     //Await.result(f1, 1 second) shouldEqual Await.result(f2, 1 second)
 
-      // val foo = {for {
-      //   r1 <- f1
-      //   r2 <- f2
-      // } yield r1 shouldEqual r2}
-      // Await.result(foo, 1 second)
+  //     // val foo = {for {
+  //     //   r1 <- f1
+  //     //   r2 <- f2
+  //     // } yield r1 shouldEqual r2}
+  //     // Await.result(foo, 1 second)
 
-      whenReady(f1) { r1 =>
-        whenReady(f2) { r2 =>
-          r1 shouldEqual r2
-        }
-      }
+  //     whenReady(f1) { r1 =>
+  //       whenReady(f2) { r2 =>
+  //         r1 shouldEqual r2
+  //       }
+  //     }
 
-      // import util._
-      // f1.onComplete {
-      //   case Success(r1) => f2.onComplete {
-      //     case Success(r2) => r1 shouldEqual r2
-      //     case _ => fail
-      //   }
-      //   case _ => fail
-      // }
-      //type F[T] = Future[Seq[T]]
-    }
+  //     // import util._
+  //     // f1.onComplete {
+  //     //   case Success(r1) => f2.onComplete {
+  //     //     case Success(r2) => r1 shouldEqual r2
+  //     //     case _ => fail
+  //     //   }
+  //     //   case _ => fail
+  //     // }
+  //     //type F[T] = Future[Seq[T]]
+  //   }
 
-    checkCatsFunctorLaws[F, Int, String, Boolean](dataIsEqual)
-  }
+  //   checkCatsFunctorLaws[F, Int, String, Boolean](dataIsEqual)
+  // }
 
   it should "Problem 6" in {
     import Problem6._
@@ -117,10 +117,10 @@ class Ch5Spec extends FlatSpec with Matchers with CatsLawChecking with ScalaFutu
     checkCatsBifunctorLaws[B, Int, String, Boolean, Char, Long, Double](dataIsEqual)
   }
 
-  it should "Problem 7" in {
-    import Problem7._
-    Unit
-  }
+  // it should "Problem 7" in {
+  //   import Problem7._
+  //   Unit
+  // }
 
   it should "Problem 8" in {
     import Problem8._
